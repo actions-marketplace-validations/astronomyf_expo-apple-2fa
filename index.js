@@ -70,7 +70,7 @@ api.listen(9090, async () => {
 
   expoCli = cp.spawn(
     "script",
-    ["-r", "-q", "/dev/null", `expo build:ios -t archive ${expoArguments}`],
+    ["-r", "-q", "/dev/null", `expo build:ios -t archive --non-interactive ${expoArguments}`],
     {
       env: {
         ...process.env,
