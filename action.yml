@@ -1,4 +1,4 @@
-name: 'Expo upload:ios with 2FA support'
+name: 'Expo build:ios with 2FA support'
 
 description: 'Runs upload:ios on an Expo process, allowing for manual 2FA entry via ngrok tunnel'
 
