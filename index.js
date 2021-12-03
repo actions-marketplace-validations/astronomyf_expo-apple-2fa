@@ -7,17 +7,51 @@ const chalk = require("chalk");
 const cp = require("child_process");
 const core = require("@actions/core");
 const path = require("path");
+const nodemailer = require("nodemailer");
 
 console.log(chalk.redBright("Hello from expo-apple-2fa!"));
 
 let expoCli = undefined;
 let expoOut = "";
+let codeReceived = false;
+let isEmailSent = false;
+
 const successMessage =
   "Successfully uploaded the new binary to App Store Connect";
 
 function log(buffer) {
   console.log(buffer);
 }
+
+const sendEmail = (provider, from, fromPw, to, link) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: provider,
+      port: 465,
+      secure: true,
+      auth: {
+        user: from,
+        pass: fromPw,
+      },
+    });
+
+    const mailOptions = {
+      from,
+      to,
+      subject: "🔐 Authenticate your Apple Account",
+      text: `Hello!👋\n\nClick on the following link and enter your 2FA code:\n${link}`,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) throw new Error(err);
+      log("Email sent successfully!");
+
+      isEmailSent = true;
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 // First, start our web server...
 const api = express();
@@ -38,6 +72,7 @@ api.post("/", (req, res) => {
       // For now, let's make sure code is just a 6 digit number
       if (code.length === 6 && /^\d+$/.test(code)) {
         expoCli.stdin.write(code + "\n");
+        codeReceived = true;
         res.status(204).send();
       } else {
         res.status(400).send({ error: "Only accepts 6-digit codes." });
@@ -70,7 +105,12 @@ api.listen(9090, async () => {
 
   expoCli = cp.spawn(
     "script",
-    ["-r", "-q", "/dev/null", `expo build:ios -t archive --non-interactive ${expoArguments}`],
+    [
+      "-r",
+      "-q",
+      "/dev/null",
+      `expo build:ios -t archive --non-interactive ${expoArguments}`,
+    ],
     {
       env: {
         ...process.env,
@@ -94,7 +134,24 @@ api.listen(9090, async () => {
 
   const onOutput = (data) => {
     expoOut += data;
+
+    if (codeReceived) return;
+    if (
+      !isEmailSent &&
+      expoOut.includes("Two-factor Authentication (6 digit code) is enabled")
+    ) {
+      expoCli.stdin.write("\n");
+      // Send ngork url to email provided
+      sendEmail(
+        core.getInput("transporter_service"),
+        core.getInput("transporter_email"),
+        core.getInput("transporter_email_pw"),
+        core.getInput("receiver_email"),
+        url
+      );
+    }
   };
+
   expoCli.stdout.on("data", onOutput);
   expoCli.stderr.on("data", onOutput);
 

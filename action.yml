@@ -18,6 +18,18 @@ inputs:
     app_specific_password:
       description: "App-specific password for Transporter to use"
       required: true
+    transporter_service:
+      description: "Email service for sending the email with the link for entering the 2FA code"
+      required: true
+    transporter_email:
+      description: "Your email"
+      required: true
+    transporter_email_pw:
+      description: "Your email password"
+      required: true
+    receiver_email:
+      description: "The email to send the message to"
+      required: true
 
 branding:
   color: green
