@@ -23,7 +23,7 @@ function log(buffer) {
   console.log(buffer);
 }
 
-const sendEmail = (from, to, link, username, password) => {
+const sendEmail = async (from, to, link, username, password) => {
   isEmailSent = true;
 
   try {
