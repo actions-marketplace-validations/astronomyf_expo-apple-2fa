@@ -7,7 +7,7 @@ const chalk = require("chalk");
 const cp = require("child_process");
 const core = require("@actions/core");
 const path = require("path");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 console.log(chalk.redBright("Hello from expo-apple-2fa!"));
 
@@ -23,30 +23,41 @@ function log(buffer) {
   console.log(buffer);
 }
 
-const sendEmail = (provider, from, fromPw, to, link) => {
-  try {
-    const transporter = nodemailer.createTransport({
-      host: provider,
-      port: 465,
-      secure: true,
-      auth: {
-        user: from,
-        pass: fromPw,
-      },
-    });
+const sendEmail = (from, to, link, username, password) => {
+  isEmailSent = true;
 
-    const mailOptions = {
-      from,
-      to,
-      subject: "🔐 Authenticate your Apple Account",
-      text: `Hello! 👋\n\nClick on the following link and enter your 2FA code:\n${link}`,
+  try {
+    const message = {
+      Messages: [
+        {
+          From: {
+            Email: from,
+            Name: from,
+          },
+          To: [
+            {
+              Email: to,
+              Name: to,
+            },
+          ],
+          Subject: "🔐 Authenticate your Apple Account",
+          TextPart: `Hello 👋!\nClick on the following link and enter your 2FA code:\n${link}`,
+          CustomID: "1234578",
+        },
+      ],
     };
 
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) throw new Error(err);
-      log("Email sent successfully!");
-
-      isEmailSent = true;
+    await axios({
+      method: "POST",
+      url: "https://api.mailjet.com/v3.1/send",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      auth: {
+        username,
+        password,
+      },
+      data: message,
     });
   } catch (err) {
     console.error(err);
@@ -143,11 +154,11 @@ api.listen(9090, async () => {
       expoCli.stdin.write("\n");
       // Send ngork url to email provided
       sendEmail(
-        core.getInput("transporter_service"),
         core.getInput("transporter_email"),
-        core.getInput("transporter_email_pw"),
         core.getInput("receiver_email"),
-        url
+        url,
+        core.getInput("mailjet_username"),
+        core.getInput("mailjet_password")
       );
     }
   };

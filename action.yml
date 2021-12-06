@@ -18,18 +18,18 @@ inputs:
     app_specific_password:
       description: "App-specific password for Transporter to use"
       required: true
-    transporter_service:
-      description: "Email service for sending the email with the link for entering the 2FA code"
-      required: true
     transporter_email:
-      description: "Your email"
-      required: true
-    transporter_email_pw:
-      description: "Your email password"
+      description: "Email to send the message from"
       required: true
     receiver_email:
-      description: "The email to send the message to"
+      description: "Email to send the message to"
+      required: true  
+    mailjet_username:
+      description: "Your developer username for Mailjet"
       required: true
+    mailjet_password:
+      description: "Your developer password for Mailjet"
+      required: true    
 
 branding:
   color: green
