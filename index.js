@@ -26,7 +26,7 @@ function log(buffer) {
 const sendEmail = (provider, from, fromPw, to, link) => {
   try {
     const transporter = nodemailer.createTransport({
-      service: provider,
+      host: provider,
       port: 465,
       secure: true,
       auth: {
@@ -39,7 +39,7 @@ const sendEmail = (provider, from, fromPw, to, link) => {
       from,
       to,
       subject: "🔐 Authenticate your Apple Account",
-      text: `Hello!👋\n\nClick on the following link and enter your 2FA code:\n${link}`,
+      text: `Hello! 👋\n\nClick on the following link and enter your 2FA code:\n${link}`,
     };
 
     transporter.sendMail(mailOptions, (err, info) => {
