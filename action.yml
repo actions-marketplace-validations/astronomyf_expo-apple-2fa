@@ -12,6 +12,9 @@ inputs:
     expo_apple_password:
       description: "Your Apple password"
       required: true
+    expo_dist_12_password:
+      description: "Your Distribution Certificate (P12) password"
+      required: false
     tfa_phone_number:
       description: "The phone number to text for 2FA"
       required: true

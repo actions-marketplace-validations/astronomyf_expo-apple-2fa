@@ -116,6 +116,7 @@ api.listen(9090, async () => {
         ...process.env,
         EXPO_APPLE_ID: core.getInput("expo_apple_id"),
         EXPO_APPLE_PASSWORD: core.getInput("expo_apple_password"),
+        EXPO_IOS_DIST_P12_PASSWORD: core.getInput("expo_dist_12_password"),
         SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER:
           core.getInput("tfa_phone_number"),
         FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: core.getInput(
