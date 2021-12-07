@@ -23,39 +23,28 @@ function log(buffer) {
   console.log(buffer);
 }
 
-const sendEmail = async (from, to, link, username, password) => {
+const sendEmail = async (from, to, link, token) => {
   isEmailSent = true;
 
   try {
     const message = {
-      Messages: [
+      personalizations: [{ to: [{ email: to }] }],
+      from: { email: from },
+      subject: "🔐 Send the code to the CI",
+      content: [
         {
-          From: {
-            Email: from,
-            Name: from,
-          },
-          To: [
-            {
-              Email: to,
-              Name: to,
-            },
-          ],
-          Subject: "🔐 Authenticate your Apple Account",
-          TextPart: `Hello 👋!\nClick on the following link and enter your 2FA code:\n${link}`,
-          CustomID: "1234578",
+          type: "text/plain",
+          value: `Hello 👋!\nClick on the following link and enter your code:\n${link}`,
         },
       ],
     };
 
     await axios({
       method: "POST",
-      url: "https://api.mailjet.com/v3.1/send",
+      url: "https://api.sendgrid.com/v3/mail/send",
       headers: {
         "Content-Type": "application/json",
-      },
-      auth: {
-        username,
-        password,
+        Authorization: `Bearer ${token}`,
       },
       data: message,
     });
@@ -154,11 +143,10 @@ api.listen(9090, async () => {
       expoCli.stdin.write("\n");
       // Send ngork url to email provided
       sendEmail(
-        core.getInput("transporter_email"),
-        core.getInput("receiver_email"),
+        core.getInput("sendgrid_email_from"),
+        core.getInput("sendgrid_email_to"),
         url,
-        core.getInput("mailjet_username"),
-        core.getInput("mailjet_password")
+        core.getInput("sendgrid_api_key"),
       );
     }
   };

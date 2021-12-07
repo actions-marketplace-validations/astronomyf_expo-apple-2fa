@@ -24,12 +24,16 @@ inputs:
     receiver_email:
       description: "Email to send the message to"
       required: true  
-    mailjet_username:
-      description: "Your developer username for Mailjet"
+    sendgrid_api_key:
+      description: "Sendgrip developer API key"
+      required: true 
+    sendgrid_email_to:
+      description: "The email to send the message to"
       required: true
-    mailjet_password:
-      description: "Your developer password for Mailjet"
-      required: true    
+    sendgrid_email_from:
+      description: "The email to send the message from"
+      required: true
+       
 
 branding:
   color: green
